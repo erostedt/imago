@@ -170,7 +170,7 @@ struct RGB24
 Image<RGB24> load_image(const fs::path &path);
 bool save_image(const Image<RGB24> &image, const fs::path &path);
 
-#ifdef IMITOR_IMPLEMENTATION
+#ifdef IMAGO_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 inline Image<RGB24> load_image(const fs::path &path)
