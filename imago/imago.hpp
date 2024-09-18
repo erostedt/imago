@@ -13,6 +13,12 @@ template <typename T> class Image
     {
         m_pixels = std::make_unique<T[]>(width * height);
     }
+    Image(size_t width, size_t height, T fill_value) : m_width(width), m_height(height)
+    {
+        size_t element_count = width * height;
+        m_pixels = std::make_unique<T[]>(element_count);
+        std::fill(m_pixels.get(), m_pixels.get() + element_count, fill_value);
+    }
     Image(size_t width, size_t height, std::unique_ptr<T[]> &&pixels)
         : m_width(width), m_height(height), m_pixels(std::move(pixels))
     {
