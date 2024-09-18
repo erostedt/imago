@@ -1,12 +1,10 @@
-#include <algorithm>
-
-#define IMITOR_IMPLEMENTATION
-#include <image.hpp>
+#define IMAGO_IMPLEMENTATION
+#include "imago.hpp"
 
 int main()
 {
-    auto img = load_image("../image.png");
-    std::transform(img.begin(), img.end(), img.begin(),
-                   [](const RGB24 pixel) -> RGB24 { return {pixel.b, pixel.g, pixel.r}; });
-    save_image(img, "../new_image.png");
+    const auto rgb = load_image("../image.png");
+    const auto bgr =
+        convert_image(rgb, [](const RGBA32 pixel) -> RGBA32 { return {pixel.b, pixel.g, pixel.r, pixel.a}; });
+    save_image(bgr, "../new_image.png");
 }

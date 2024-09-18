@@ -161,11 +161,12 @@ template <typename T> class Image
     std::unique_ptr<T[]> m_pixels;
 };
 
-struct RGB24
+struct RGBA32
 {
     uint8_t r;
     uint8_t g;
     uint8_t b;
+    uint8_t a;
 };
 
 template <typename T, typename UnaryFunction> auto convert_image(const Image<T> &image, const UnaryFunction &function)
@@ -176,16 +177,16 @@ template <typename T, typename UnaryFunction> auto convert_image(const Image<T> 
     return output;
 }
 
-inline uint8_t rgb2gray(RGB24 rgb)
+inline uint8_t rgba_to_gray(const RGBA32 rgba)
 {
-    uint32_t red = static_cast<uint32_t>(rgb.r);
-    uint32_t green = static_cast<uint32_t>(rgb.g);
-    uint32_t blue = static_cast<uint32_t>(rgb.b);
+    const uint32_t red = static_cast<uint32_t>(rgba.r);
+    const uint32_t green = static_cast<uint32_t>(rgba.g);
+    const uint32_t blue = static_cast<uint32_t>(rgba.b);
     return (299u * red + 587u * green + 114u * blue) / 1000u;
 }
 
-inline Image<RGB24> load_image(const fs::path &path);
-inline bool save_image(const Image<RGB24> &image, const fs::path &path);
+inline Image<RGBA32> load_image(const fs::path &path);
+inline bool save_image(const Image<RGBA32> &image, const fs::path &path);
 using BinImg = Image<bool>;
 
 #ifdef IMAGO_IMPLEMENTATION
@@ -198,26 +199,27 @@ using BinImg = Image<bool>;
 #include "stb_image_write.h"
 #pragma GCC diagnostic pop
 
-inline Image<RGB24> load_image(const fs::path &path)
+inline Image<RGBA32> load_image(const fs::path &path)
 {
     int width, height, components;
-    uint8_t *bytes = stbi_load(path.c_str(), &width, &height, &components, STBI_rgb);
+    uint8_t *bytes = stbi_load(path.c_str(), &width, &height, &components, STBI_rgb_alpha);
     assert(bytes != NULL);
     size_t size = width * height;
-    std::unique_ptr<RGB24[]> pixels = std::make_unique<RGB24[]>(size);
-    memcpy(pixels.get(), bytes, size * sizeof(RGB24));
-    Image<RGB24> image(width, height, std::move(pixels));
+    std::unique_ptr<RGBA32[]> pixels = std::make_unique<RGBA32[]>(size);
+    memcpy(pixels.get(), bytes, size * sizeof(RGBA32));
+    Image<RGBA32> image(width, height, std::move(pixels));
     free(bytes);
     return image;
 }
 
-inline bool save_image(const Image<RGB24> &image, const fs::path &path)
+inline bool save_image(const Image<RGBA32> &image, const fs::path &path)
 {
-    const size_t component_count = 3;
+    const size_t component_count = 4;
     const size_t stride_in_bytes = image.width() * component_count;
 
     int result =
         stbi_write_png(path.c_str(), image.width(), image.height(), component_count, image.data(), stride_in_bytes);
     return result != 0;
 }
+
 #endif
