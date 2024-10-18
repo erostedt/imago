@@ -193,7 +193,6 @@ inline uint8_t rgba_to_gray(const RGBA32 rgba)
 
 inline Image<RGBA32> load_image(const fs::path &path);
 inline bool save_image(const Image<RGBA32> &image, const fs::path &path);
-using BinImg = Image<bool>;
 
 #ifdef IMAGO_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
